@@ -2,7 +2,6 @@ import {  Card, CardContent, Grid, Stack, Typography } from '@mui/material'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import React from 'react'
 
 const MonthlySummary = () => {
   return (
