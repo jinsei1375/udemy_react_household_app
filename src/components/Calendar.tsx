@@ -1,10 +1,18 @@
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import jaLocale from "@fullcalendar/core/locales/ja"
-import { EventContentArg } from '@fullcalendar/core'
+import { DatesSetArg, EventContentArg } from '@fullcalendar/core'
 import "../calendar.css"
+import { calculatateDailyBalances } from '../utils/financeCalculataions'
+import { Balance, CalendarContent, Transaction } from '../types'
+import { formatCurrency } from '../utils/formatting'
 
-const Calendar = () => {
+interface CalendarProps {
+  monthlyTransactions: Transaction[],
+  setCurrentMonth: React.Dispatch<React.SetStateAction<Date>>
+}
+
+const Calendar = ({monthlyTransactions, setCurrentMonth}:CalendarProps) => {
 
   const events = [
     {title: 'Meeting', start: "2024-04-04"},
@@ -28,13 +36,35 @@ const Calendar = () => {
     )
   }
 
+   // FullCalendar表示のためのイベント生成
+  const createCalendarEvents = (dailyBalances: Record<string, Balance>): CalendarContent[] => {
+    return Object.keys(dailyBalances).map((date) => {
+      const {income, expense, balance} = dailyBalances[date]
+      return {
+        start: date,
+        income: formatCurrency(income),
+        expense: formatCurrency(expense),
+        balance: formatCurrency(balance)
+      }
+    })
+  }
+
+  // 日付ごとの収支
+  const dailyBalances = calculatateDailyBalances(monthlyTransactions);
+  const calendarEvents = createCalendarEvents(dailyBalances);
+
+  const handleDateSet = (dateSetInfo:DatesSetArg) => {
+    setCurrentMonth(dateSetInfo.view.currentStart)
+  }
+
   return (
     <FullCalendar 
       locale={jaLocale}
       plugins={[dayGridPlugin]}
       initialView='dayGridMonth'
-      events={events}
+      events={calendarEvents}
       eventContent={renderEventContent}
+      datesSet={handleDateSet}
     />
   )
 }

@@ -9,9 +9,10 @@ import { format } from 'date-fns'
 
 interface HomeProps {
   monthlyTransactions: Transaction[],
+  setCurrentMonth: React.Dispatch<React.SetStateAction<Date>>
 }
 
-const Home = ({monthlyTransactions}: HomeProps) => {
+const Home = ({monthlyTransactions, setCurrentMonth}: HomeProps) => {
   const today = format (new Date(), "yyyy-MM-dd");
   console.log(today);
   const [currentDay, setCurrentDay] = useState(today);
@@ -21,7 +22,7 @@ const Home = ({monthlyTransactions}: HomeProps) => {
       {/* 左側コンテンツ */}
       <Box sx={{ flexGrow: 1 }}>
         <MonthlySummary monthlyTransactions={monthlyTransactions}/>
-        <Calendar />
+        <Calendar monthlyTransactions={monthlyTransactions} setCurrentMonth={setCurrentMonth} />
       </Box>
 
       {/* 右側コンテンツ */}
