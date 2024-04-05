@@ -2,7 +2,7 @@ import { Balance, Transaction } from "../types";
 
 export function financeCalculations(transactions: Transaction[]): Balance {
   return transactions.reduce((acc, transaction) => {
-    if (transaction.type == 'income') {
+    if (transaction.type === 'income') {
       acc.income += transaction.amount;
     } else {
       acc.expense += transaction.amount;
