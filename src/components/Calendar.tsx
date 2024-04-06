@@ -8,22 +8,33 @@ import { Balance, CalendarContent, Transaction } from '../types'
 import { formatCurrency } from '../utils/formatting'
 import interactionPlugin from '@fullcalendar/interaction';
 import { DateClickArg } from '@fullcalendar/interaction';
+import { useTheme } from '@mui/material'
+import { isSameMonth } from 'date-fns'
 
 interface CalendarProps {
   monthlyTransactions: Transaction[],
   setCurrentMonth: React.Dispatch<React.SetStateAction<Date>>,
   setCurrentDay: React.Dispatch<React.SetStateAction<string>>,
+  currentDay: string,
+  today: string
 }
 
-const Calendar = ({monthlyTransactions, setCurrentMonth, setCurrentDay}:CalendarProps) => {
+const Calendar = ({monthlyTransactions, setCurrentMonth, setCurrentDay, currentDay, today}:CalendarProps) => {
+  const theme = useTheme();
 
   const events = [
     {title: 'Meeting', start: "2024-04-04"},
     {title: 'Meeting', start: "2024-04-04", income: 300, expense: 400, balance: -100},
   ]
 
+  const backgroundEvent = {
+    start: currentDay,
+    display: "background",
+    backgroundColor: theme.palette.incomeColor.light
+  }
+
   const renderEventContent = (eventInfo: EventContentArg) => {
-    console.log(eventInfo);
+    // console.log(eventInfo);
     return (
       <div>
         <div className='money' id='event-income'>
@@ -57,7 +68,13 @@ const Calendar = ({monthlyTransactions, setCurrentMonth, setCurrentDay}:Calendar
   const calendarEvents = createCalendarEvents(dailyBalances);
 
   const handleDateSet = (dateSetInfo:DatesSetArg) => {
-    setCurrentMonth(dateSetInfo.view.currentStart)
+    const currentMonth = dateSetInfo.view.currentStart
+    setCurrentMonth(currentMonth);
+
+    if (isSameMonth(new Date(), currentMonth)) {
+      setCurrentDay(today);
+    }
+
   }
 
   const handleDateClick = (dateInfo: DateClickArg) => {
@@ -69,7 +86,7 @@ const Calendar = ({monthlyTransactions, setCurrentMonth, setCurrentDay}:Calendar
       locale={jaLocale}
       plugins={[dayGridPlugin, interactionPlugin]}
       initialView='dayGridMonth'
-      events={calendarEvents}
+      events={[...calendarEvents, backgroundEvent]}
       eventContent={renderEventContent}
       datesSet={handleDateSet}
       dateClick={handleDateClick}
