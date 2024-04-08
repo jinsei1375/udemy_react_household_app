@@ -66,6 +66,7 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
           <CloseIcon />
         </IconButton>
       </Box>
+      {/* テスト */}
       {/* フォーム要素 */}
       <Box component={"form"}>
         <Stack spacing={2}>
