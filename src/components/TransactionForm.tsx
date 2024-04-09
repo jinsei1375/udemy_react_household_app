@@ -9,10 +9,12 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
 import CloseIcon from "@mui/icons-material/Close"; // 閉じるボタン用のアイコン
 import FastfoodIcon from "@mui/icons-material/Fastfood"; //食事アイコン
 import { Controller, useForm } from "react-hook-form";
+import { ExpenseCategory, IncomeCategory } from "../types";
+import { AddBusiness, AddHome, Alarm, Diversity3, Fastfood, Savings, SportsTennis, Work } from "@mui/icons-material";
+import { useEffect, useState } from "react";
 
 interface TransactionFormProps {
   onCloseForm: () => void,
@@ -20,10 +22,33 @@ interface TransactionFormProps {
   currentDay: string
 }
 
+type IncomeExpense = "income" | "expense";
+
+interface CategoryItem {
+  label: IncomeCategory | ExpenseCategory,
+  icon: JSX.Element
+}
+
 const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: TransactionFormProps) => {
   const formWidth = 320;
 
-  const { control } = useForm({
+  const expenseCategories: CategoryItem[] = [
+    {label: "食費", icon: <FastfoodIcon fontSize="small" />},
+    {label: "日用品", icon: <Alarm fontSize='small' />},
+    {label: "交際費", icon: <Diversity3 fontSize='small' />},
+    {label: "娯楽", icon: <SportsTennis fontSize='small' />},
+    {label: "固定費", icon: <AddHome fontSize='small' />},
+  ];
+
+  const incomeCategories: CategoryItem[] = [
+    {label: "給与", icon: <Work fontSize='small' />},
+    {label: "副収入", icon: <AddBusiness fontSize='small' />},
+    {label: "お小遣い", icon: <Savings fontSize='small' />},
+  ]
+
+  const [categories, setCategories] = useState(expenseCategories);
+
+  const { control, setValue, watch } = useForm({
     defaultValues: {
       type: "expense",
       date: currentDay,
@@ -32,6 +57,26 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
       content: "",
     }
   });
+
+  const incomeExpenseToggle = (type: IncomeExpense) => {
+    setValue("type", type);
+    console.log(type);
+    type === "income" ? setCategories(incomeCategories) : setCategories(expenseCategories);
+  }
+
+  // 収支タイプを監視
+  const currentType = watch("type");
+
+  useEffect(() => {
+    setValue("date", currentDay);
+  }, [currentDay]);
+
+  // React推奨のuseEffectの使用方法ではない？ Reactの外側との連携に留めるべき？
+  // useEffect(() => {
+  //   const newCategories = currentType === "income" ? incomeCategories : expenseCategories;
+  //   console.log(newCategories);
+  //   setCategories(newCategories);
+  // }, [currentType])
 
   return (
     <Box
@@ -76,10 +121,19 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
             control={control}
             render={({field}) => (
               <ButtonGroup fullWidth>
-                <Button variant={"contained"} color="error">
+                <Button 
+                  variant={field.value === "expense" ? "contained" : "outlined"} 
+                  color="error" 
+                  onClick={() => incomeExpenseToggle('expense')}
+                >
                   支出
                 </Button>
-                <Button>収入</Button>
+                <Button 
+                  variant={field.value === "income" ? "contained" : "outlined"} 
+                  onClick={() => incomeExpenseToggle('income')}
+                >
+                  収入
+                </Button>
               </ButtonGroup>
             )}
           />
@@ -104,12 +158,14 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
             control={control}
             render={({field}) => (
             <TextField {...field} id="カテゴリ" label="カテゴリ" select >
-              <MenuItem value={"食費"}>
-                <ListItemIcon>
-                  <FastfoodIcon />
-                </ListItemIcon>
-                食費
-              </MenuItem>
+              {categories.map((category) => (
+                <MenuItem value={category.label} key={category.label}>
+                  <ListItemIcon>
+                    {category.icon}
+                  </ListItemIcon>
+                  {category.label}
+                </MenuItem>
+              ))}
             </TextField>
             )}
           />
@@ -130,7 +186,12 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
             )}
           />
           {/* 保存ボタン */}
-          <Button type="submit" variant="contained" color={"primary"} fullWidth>
+          <Button 
+            type="submit" 
+            variant="contained" 
+            color={currentType === "income" ? "primary" : "error"} 
+            fullWidth
+          >
             保存
           </Button>
         </Stack>
