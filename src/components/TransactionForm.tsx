@@ -174,7 +174,16 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
             name="amount"
             control={control}
             render={({field}) => (
-              <TextField {...field} label="金額" type="number" />
+              <TextField 
+                {...field} 
+                value={field.value === 0 ? "" : field.value}
+                onChange={(e) => {
+                  const newValue = parseInt(e.target.value, 10) || 0;
+                  field.onChange(newValue);
+                }}
+                label="金額" 
+                type="number" 
+              />
             )}
           />
           {/* 内容 */}
