@@ -15,6 +15,8 @@ import { Controller, useForm } from "react-hook-form";
 import { ExpenseCategory, IncomeCategory } from "../types";
 import { AddBusiness, AddHome, Alarm, Diversity3, Fastfood, Savings, SportsTennis, Work } from "@mui/icons-material";
 import { useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { transactionScheme } from "../validations/schema";
 
 interface TransactionFormProps {
   onCloseForm: () => void,
@@ -48,14 +50,19 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
 
   const [categories, setCategories] = useState(expenseCategories);
 
-  const { control, setValue, watch } = useForm({
+  const { control, 
+    setValue, 
+    watch, 
+    formState:{errors}, 
+    handleSubmit } = useForm({
     defaultValues: {
       type: "expense",
       date: currentDay,
       amount: 0,
       category: "",
       content: "",
-    }
+    },
+    resolver: zodResolver(transactionScheme),
   });
 
   const incomeExpenseToggle = (type: IncomeExpense) => {
@@ -70,6 +77,10 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
   useEffect(() => {
     setValue("date", currentDay);
   }, [currentDay]);
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+  }
 
   // React推奨のuseEffectの使用方法ではない？ Reactの外側との連携に留めるべき？
   // useEffect(() => {
@@ -113,7 +124,7 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
       </Box>
       {/* テスト */}
       {/* フォーム要素 */}
-      <Box component={"form"}>
+      <Box component={"form"} onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
           {/* 収支切り替えボタン */}
           <Controller 
@@ -149,6 +160,8 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
                 InputLabelProps={{
                   shrink: true,
                 }}
+                error={!!errors.date}
+                helperText={errors.date?.message}
               />
             )}
           />
@@ -157,7 +170,14 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
             name="category"
             control={control}
             render={({field}) => (
-            <TextField {...field} id="カテゴリ" label="カテゴリ" select >
+            <TextField 
+              {...field} 
+              id="カテゴリ" 
+              label="カテゴリ" 
+              select 
+              error={!!errors.category}
+              helperText={errors.category?.message}
+            >
               {categories.map((category) => (
                 <MenuItem value={category.label} key={category.label}>
                   <ListItemIcon>
@@ -183,6 +203,8 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
                 }}
                 label="金額" 
                 type="number" 
+                error={!!errors.amount}
+                helperText={errors.amount?.message}
               />
             )}
           />
@@ -191,7 +213,13 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
             name="content"
             control={control}
             render={({field}) => (
-              <TextField {...field} label="内容" type="text" />
+              <TextField 
+                {...field} 
+                label="内容" 
+                type="text" 
+                error={!!errors.content}
+                helperText={errors.content?.message}
+              />
             )}
           />
           {/* 保存ボタン */}
