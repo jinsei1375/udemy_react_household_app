@@ -11,17 +11,18 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close"; // 閉じるボタン用のアイコン
 import FastfoodIcon from "@mui/icons-material/Fastfood"; //食事アイコン
-import { Controller, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { ExpenseCategory, IncomeCategory } from "../types";
 import { AddBusiness, AddHome, Alarm, Diversity3, Fastfood, Savings, SportsTennis, Work } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { transactionScheme } from "../validations/schema";
+import { Schema, transactionScheme } from "../validations/schema";
 
 interface TransactionFormProps {
   onCloseForm: () => void,
   isEntryDrawerOpen: boolean,
-  currentDay: string
+  currentDay: string,
+  onSaveTransaction: (transaction: Schema) => Promise<void>,
 }
 
 type IncomeExpense = "income" | "expense";
@@ -31,7 +32,7 @@ interface CategoryItem {
   icon: JSX.Element
 }
 
-const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: TransactionFormProps) => {
+const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay, onSaveTransaction}: TransactionFormProps) => {
   const formWidth = 320;
 
   const expenseCategories: CategoryItem[] = [
@@ -54,7 +55,7 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
     setValue, 
     watch, 
     formState:{errors}, 
-    handleSubmit } = useForm({
+    handleSubmit } = useForm<Schema>({
     defaultValues: {
       type: "expense",
       date: currentDay,
@@ -78,8 +79,9 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay}: Transacti
     setValue("date", currentDay);
   }, [currentDay]);
 
-  const onSubmit = (data: any) => {
+  const onSubmit: SubmitHandler<Schema> = (data) => {
     console.log(data);
+    onSaveTransaction(data);
   }
 
   // React推奨のuseEffectの使用方法ではない？ Reactの外側との連携に留めるべき？
