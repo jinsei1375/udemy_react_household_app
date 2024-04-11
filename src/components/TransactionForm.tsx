@@ -12,7 +12,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close"; // 閉じるボタン用のアイコン
 import FastfoodIcon from "@mui/icons-material/Fastfood"; //食事アイコン
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { ExpenseCategory, IncomeCategory } from "../types";
+import { ExpenseCategory, IncomeCategory, Transaction } from "../types";
 import { AddBusiness, AddHome, Alarm, Diversity3, Fastfood, Savings, SportsTennis, Work } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -23,16 +23,23 @@ interface TransactionFormProps {
   isEntryDrawerOpen: boolean,
   currentDay: string,
   onSaveTransaction: (transaction: Schema) => Promise<void>,
+  selectedTransaction: Transaction | null,
 }
 
 type IncomeExpense = "income" | "expense";
 
 interface CategoryItem {
   label: IncomeCategory | ExpenseCategory,
-  icon: JSX.Element
+  icon: JSX.Element,
 }
 
-const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay, onSaveTransaction}: TransactionFormProps) => {
+const TransactionForm = ({
+  onCloseForm, 
+  isEntryDrawerOpen, 
+  currentDay, 
+  onSaveTransaction, 
+  selectedTransaction
+}: TransactionFormProps) => {
   const formWidth = 320;
 
   const expenseCategories: CategoryItem[] = [
@@ -55,6 +62,7 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay, onSaveTran
     setValue, 
     watch, 
     formState:{errors}, 
+    reset,
     handleSubmit } = useForm<Schema>({
     defaultValues: {
       type: "expense",
@@ -68,7 +76,7 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay, onSaveTran
 
   const incomeExpenseToggle = (type: IncomeExpense) => {
     setValue("type", type);
-    console.log(type);
+    setValue("category", "");
     type === "income" ? setCategories(incomeCategories) : setCategories(expenseCategories);
   }
 
@@ -79,10 +87,28 @@ const TransactionForm = ({onCloseForm, isEntryDrawerOpen, currentDay, onSaveTran
     setValue("date", currentDay);
   }, [currentDay]);
 
+  // 送信処理
   const onSubmit: SubmitHandler<Schema> = (data) => {
     console.log(data);
     onSaveTransaction(data);
+    reset({
+      type: "expense",
+      date: currentDay,
+      amount: 0,
+      category: "",
+      content: "",
+    });
   }
+
+  useEffect(() => {
+    if (selectedTransaction) {
+      setValue("type", selectedTransaction.type);
+      setValue("date", selectedTransaction.date);
+      setValue("amount", selectedTransaction.amount);
+      setValue("category", selectedTransaction.category);
+      setValue("content", selectedTransaction.content);
+    }
+  }, [selectedTransaction])
 
   // React推奨のuseEffectの使用方法ではない？ Reactの外側との連携に留めるべき？
   // useEffect(() => {

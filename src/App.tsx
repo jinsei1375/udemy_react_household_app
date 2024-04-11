@@ -25,6 +25,7 @@ function App() {
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
 
   useEffect(() => {
@@ -100,6 +101,8 @@ function App() {
                 monthlyTransactions={monthlyTransactions} 
                 setCurrentMonth={setCurrentMonth}
                 onSaveTransaction={hanleSaveTransaction}
+                selectedTransaction={selectedTransaction}
+                setSelectedTransaction={setSelectedTransaction}
               />
             } 
           />

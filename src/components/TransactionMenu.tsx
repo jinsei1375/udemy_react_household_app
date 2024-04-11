@@ -22,10 +22,11 @@ import IconComponents from "./common/IconComponents";
 interface TransactionMenuProps {
   dailyTransactions: Transaction[],
   currentDay: string,
-  onHandleAddTransactionForm: () => void
+  onHandleAddTransactionForm: () => void,
+  onSelectTransaction: (transaction: Transaction) => void,
 }
 
-const TransactionMenu = ({dailyTransactions, currentDay, onHandleAddTransactionForm}: TransactionMenuProps) => {
+const TransactionMenu = ({dailyTransactions, currentDay, onHandleAddTransactionForm, onSelectTransaction}: TransactionMenuProps) => {
   const menuDrawerWidth = 320;
   return (
     <Drawer
@@ -79,6 +80,7 @@ const TransactionMenu = ({dailyTransactions, currentDay, onHandleAddTransactionF
                       width: "100%",
                       backgroundColor: transaction.type === 'income' ? (theme) => theme.palette.incomeColor.light : (theme) => theme.palette.expenseColor.light
                     }}
+                    onClick={() => onSelectTransaction(transaction)}
                   >
                     <CardActionArea>
                       <CardContent>
