@@ -34,10 +34,15 @@ const Home = ({
 
   // フォームの開閉処理
   const handleAddTransactionForm = () => {
-    setIsEntryDrawerOpen(!isEntryDrawerOpen);
+    if (selectedTransaction) {
+      setSelectedTransaction(null);
+    } else {
+      setIsEntryDrawerOpen(!isEntryDrawerOpen);
+    }
   }
 
   const onCloseForm = () => {
+    setSelectedTransaction(null);
     setIsEntryDrawerOpen(!isEntryDrawerOpen);
   }
 
