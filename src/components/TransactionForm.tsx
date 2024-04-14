@@ -13,57 +13,74 @@ import CloseIcon from "@mui/icons-material/Close"; // 閉じるボタン用の�
 import FastfoodIcon from "@mui/icons-material/Fastfood"; //食事アイコン
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { ExpenseCategory, IncomeCategory, Transaction } from "../types";
-import { AddBusiness, AddHome, Alarm, Diversity3, Fastfood, Savings, SportsTennis, Work } from "@mui/icons-material";
+import {
+  AddBusiness,
+  AddHome,
+  Alarm,
+  Diversity3,
+  Fastfood,
+  Savings,
+  SportsTennis,
+  Work,
+} from "@mui/icons-material";
 import { useEffect, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod"
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Schema, transactionScheme } from "../validations/schema";
 
 interface TransactionFormProps {
-  onCloseForm: () => void,
-  isEntryDrawerOpen: boolean,
-  currentDay: string,
-  onSaveTransaction: (transaction: Schema) => Promise<void>,
-  selectedTransaction: Transaction | null,
+  onCloseForm: () => void;
+  isEntryDrawerOpen: boolean;
+  currentDay: string;
+  onSaveTransaction: (transaction: Schema) => Promise<void>;
+  selectedTransaction: Transaction | null;
+  onDeleteTransaction: (transactionId: string) => Promise<void>;
+  setSelectedTransaction: React.Dispatch<
+    React.SetStateAction<Transaction | null>
+  >;
 }
 
 type IncomeExpense = "income" | "expense";
 
 interface CategoryItem {
-  label: IncomeCategory | ExpenseCategory,
-  icon: JSX.Element,
+  label: IncomeCategory | ExpenseCategory;
+  icon: JSX.Element;
 }
 
 const TransactionForm = ({
-  onCloseForm, 
-  isEntryDrawerOpen, 
-  currentDay, 
-  onSaveTransaction, 
-  selectedTransaction
+  onCloseForm,
+  isEntryDrawerOpen,
+  currentDay,
+  onSaveTransaction,
+  selectedTransaction,
+  onDeleteTransaction,
+  setSelectedTransaction,
 }: TransactionFormProps) => {
   const formWidth = 320;
 
   const expenseCategories: CategoryItem[] = [
-    {label: "食費", icon: <FastfoodIcon fontSize="small" />},
-    {label: "日用品", icon: <Alarm fontSize='small' />},
-    {label: "交際費", icon: <Diversity3 fontSize='small' />},
-    {label: "娯楽", icon: <SportsTennis fontSize='small' />},
-    {label: "固定費", icon: <AddHome fontSize='small' />},
+    { label: "食費", icon: <FastfoodIcon fontSize="small" /> },
+    { label: "日用品", icon: <Alarm fontSize="small" /> },
+    { label: "交際費", icon: <Diversity3 fontSize="small" /> },
+    { label: "娯楽", icon: <SportsTennis fontSize="small" /> },
+    { label: "固定費", icon: <AddHome fontSize="small" /> },
   ];
 
   const incomeCategories: CategoryItem[] = [
-    {label: "給与", icon: <Work fontSize='small' />},
-    {label: "副収入", icon: <AddBusiness fontSize='small' />},
-    {label: "お小遣い", icon: <Savings fontSize='small' />},
-  ]
+    { label: "給与", icon: <Work fontSize="small" /> },
+    { label: "副収入", icon: <AddBusiness fontSize="small" /> },
+    { label: "お小遣い", icon: <Savings fontSize="small" /> },
+  ];
 
   const [categories, setCategories] = useState(expenseCategories);
 
-  const { control, 
-    setValue, 
-    watch, 
-    formState:{errors}, 
+  const {
+    control,
+    setValue,
+    watch,
+    formState: { errors },
     reset,
-    handleSubmit } = useForm<Schema>({
+    handleSubmit,
+  } = useForm<Schema>({
     defaultValues: {
       type: "expense",
       date: currentDay,
@@ -77,8 +94,10 @@ const TransactionForm = ({
   const incomeExpenseToggle = (type: IncomeExpense) => {
     setValue("type", type);
     setValue("category", "");
-    type === "income" ? setCategories(incomeCategories) : setCategories(expenseCategories);
-  }
+    type === "income"
+      ? setCategories(incomeCategories)
+      : setCategories(expenseCategories);
+  };
 
   // 収支タイプを監視
   const currentType = watch("type");
@@ -98,8 +117,9 @@ const TransactionForm = ({
       category: "",
       content: "",
     });
-  }
+  };
 
+  // フォーム内容更新
   useEffect(() => {
     if (selectedTransaction) {
       setValue("type", selectedTransaction.type);
@@ -116,7 +136,7 @@ const TransactionForm = ({
         content: "",
       });
     }
-  }, [selectedTransaction])
+  }, [selectedTransaction]);
 
   // React推奨のuseEffectの使用方法ではない？ Reactの外側との連携に留めるべき？
   // useEffect(() => {
@@ -124,6 +144,13 @@ const TransactionForm = ({
   //   console.log(newCategories);
   //   setCategories(newCategories);
   // }, [currentType])
+
+  const handleDelete = () => {
+    if (selectedTransaction) {
+      onDeleteTransaction(selectedTransaction.id);
+      setSelectedTransaction(null);
+    }
+  };
 
   return (
     <Box
@@ -163,21 +190,21 @@ const TransactionForm = ({
       <Box component={"form"} onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
           {/* 収支切り替えボタン */}
-          <Controller 
+          <Controller
             name="type"
             control={control}
-            render={({field}) => (
+            render={({ field }) => (
               <ButtonGroup fullWidth>
-                <Button 
-                  variant={field.value === "expense" ? "contained" : "outlined"} 
-                  color="error" 
-                  onClick={() => incomeExpenseToggle('expense')}
+                <Button
+                  variant={field.value === "expense" ? "contained" : "outlined"}
+                  color="error"
+                  onClick={() => incomeExpenseToggle("expense")}
                 >
                   支出
                 </Button>
-                <Button 
-                  variant={field.value === "income" ? "contained" : "outlined"} 
-                  onClick={() => incomeExpenseToggle('income')}
+                <Button
+                  variant={field.value === "income" ? "contained" : "outlined"}
+                  onClick={() => incomeExpenseToggle("income")}
                 >
                   収入
                 </Button>
@@ -185,10 +212,10 @@ const TransactionForm = ({
             )}
           />
           {/* 日付 */}
-          <Controller 
+          <Controller
             name="date"
             control={control}
-            render={({field}) => (
+            render={({ field }) => (
               <TextField
                 {...field}
                 label="日付"
@@ -202,71 +229,79 @@ const TransactionForm = ({
             )}
           />
           {/* カテゴリ */}
-          <Controller 
+          <Controller
             name="category"
             control={control}
-            render={({field}) => (
-            <TextField 
-              {...field} 
-              id="カテゴリ" 
-              label="カテゴリ" 
-              select 
-              error={!!errors.category}
-              helperText={errors.category?.message}
-            >
-              {categories.map((category) => (
-                <MenuItem value={category.label} key={category.label}>
-                  <ListItemIcon>
-                    {category.icon}
-                  </ListItemIcon>
-                  {category.label}
-                </MenuItem>
-              ))}
-            </TextField>
+            render={({ field }) => (
+              <TextField
+                {...field}
+                id="カテゴリ"
+                label="カテゴリ"
+                select
+                error={!!errors.category}
+                helperText={errors.category?.message}
+              >
+                {categories.map((category) => (
+                  <MenuItem value={category.label} key={category.label}>
+                    <ListItemIcon>{category.icon}</ListItemIcon>
+                    {category.label}
+                  </MenuItem>
+                ))}
+              </TextField>
             )}
           />
           {/* 金額 */}
-          <Controller 
+          <Controller
             name="amount"
             control={control}
-            render={({field}) => (
-              <TextField 
-                {...field} 
+            render={({ field }) => (
+              <TextField
+                {...field}
                 value={field.value === 0 ? "" : field.value}
                 onChange={(e) => {
                   const newValue = parseInt(e.target.value, 10) || 0;
                   field.onChange(newValue);
                 }}
-                label="金額" 
-                type="number" 
+                label="金額"
+                type="number"
                 error={!!errors.amount}
                 helperText={errors.amount?.message}
               />
             )}
           />
           {/* 内容 */}
-          <Controller 
+          <Controller
             name="content"
             control={control}
-            render={({field}) => (
-              <TextField 
-                {...field} 
-                label="内容" 
-                type="text" 
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="内容"
+                type="text"
                 error={!!errors.content}
                 helperText={errors.content?.message}
               />
             )}
           />
           {/* 保存ボタン */}
-          <Button 
-            type="submit" 
-            variant="contained" 
-            color={currentType === "income" ? "primary" : "error"} 
+          <Button
+            type="submit"
+            variant="contained"
+            color={currentType === "income" ? "primary" : "error"}
             fullWidth
           >
             保存
           </Button>
+          {selectedTransaction && (
+            <Button
+              onClick={handleDelete}
+              variant="outlined"
+              color={"secondary"}
+              fullWidth
+            >
+              削除
+            </Button>
+          )}
         </Stack>
       </Box>
     </Box>
