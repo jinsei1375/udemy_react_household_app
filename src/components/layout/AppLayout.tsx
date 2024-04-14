@@ -11,7 +11,6 @@ import SideBar from '../common/SideBar';
 
 const drawerWidth = 240;
 
-
 export default function AppLayout() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
@@ -31,9 +30,14 @@ export default function AppLayout() {
     }
   };
 
-
   return (
-    <Box sx={{ display: 'flex', bgcolor: (theme) => theme.palette.grey[100], minHeight: "100vh" }}>
+    <Box
+      sx={{
+        display: 'flex',
+        bgcolor: (theme) => theme.palette.grey[100],
+        minHeight: '100vh',
+      }}
+    >
       <CssBaseline />
 
       {/* ヘッダー */}
@@ -54,13 +58,18 @@ export default function AppLayout() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" fontWeight="fontWeightBold">
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            fontWeight="fontWeightBold"
+          >
             React × TypeScript 家計簿
           </Typography>
         </Toolbar>
       </AppBar>
-      
-      <SideBar 
+
+      <SideBar
         drawerWidth={drawerWidth}
         mobileOpen={mobileOpen}
         handleDrawerToggle={handleDrawerToggle}
@@ -69,7 +78,11 @@ export default function AppLayout() {
       {/* メインコンテンツ */}
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 3, width: { md: `calc(100% - ${drawerWidth}px)` } }}
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+        }}
       >
         <Toolbar />
         <Outlet />

@@ -1,37 +1,50 @@
-import { Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar } from '@mui/material'
+import {
+  Box,
+  Divider,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+} from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import EqualizerIcon from '@mui/icons-material/Equalizer';
 import React, { CSSProperties } from 'react';
 import { NavLink } from 'react-router-dom';
 
 interface SideBarProps {
-  drawerWidth: number, 
-  mobileOpen:boolean, 
-  handleDrawerToggle: () => void
+  drawerWidth: number;
+  mobileOpen: boolean;
+  handleDrawerToggle: () => void;
 }
 
 interface menuItem {
-  text: string,
-  path: string,
-  icon: React.ComponentType
+  text: string;
+  path: string;
+  icon: React.ComponentType;
 }
 
-const SideBar = ({drawerWidth, mobileOpen, handleDrawerToggle}: SideBarProps) => {
+const SideBar = ({
+  drawerWidth,
+  mobileOpen,
+  handleDrawerToggle,
+}: SideBarProps) => {
+  const MenueItems: menuItem[] = [
+    { text: 'Home', path: '/', icon: HomeIcon },
+    { text: 'Report', path: '/report', icon: EqualizerIcon },
+  ];
 
-  const MenueItems:menuItem[] = [
-    {text: "Home", path: "/", icon: HomeIcon},
-    {text: "Report", path: "/report", icon: EqualizerIcon},
-  ]
+  const baseLinkStyle: CSSProperties = {
+    textDecoration: 'none',
+    color: 'inherit',
+    display: 'block',
+  };
 
-  const baseLinkStyle:CSSProperties = {
-    textDecoration: "none",
-    color: "inherit",
-    display: "block"
-  }
-
-  const activeLinkStyle:CSSProperties = {
-    backgroundColor: "rgba(0, 0, 0, 0.08)"
-  }
+  const activeLinkStyle: CSSProperties = {
+    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+  };
 
   const drawer = (
     <div>
@@ -39,12 +52,16 @@ const SideBar = ({drawerWidth, mobileOpen, handleDrawerToggle}: SideBarProps) =>
       <Divider />
       <List>
         {MenueItems.map((item, index) => (
-          <NavLink key={index} to={item.path} style={({isActive}) => {
-            return {
-              ...baseLinkStyle,
-              ...(isActive ? activeLinkStyle: {})
-            }
-          }}>
+          <NavLink
+            key={index}
+            to={item.path}
+            style={({ isActive }) => {
+              return {
+                ...baseLinkStyle,
+                ...(isActive ? activeLinkStyle : {}),
+              };
+            }}
+          >
             <ListItem key={index} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
@@ -93,7 +110,7 @@ const SideBar = ({drawerWidth, mobileOpen, handleDrawerToggle}: SideBarProps) =>
         {drawer}
       </Drawer>
     </Box>
-  )
-}
+  );
+};
 
-export default SideBar
+export default SideBar;

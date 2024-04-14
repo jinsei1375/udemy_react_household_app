@@ -87,6 +87,7 @@ function App() {
     }
   };
 
+  // 削除処理
   const handleDeleteTransaction = async (transactionId: string) => {
     try {
       await deleteDoc(doc(db, "Transactions", transactionId));
