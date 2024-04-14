@@ -1,9 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 const Nomatch = () => {
-  return (
-    <div>このページはありません</div>
-  )
-}
+  return <div>このページはありません</div>;
+};
 
-export default Nomatch
+export default Nomatch;
