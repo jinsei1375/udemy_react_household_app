@@ -8,11 +8,11 @@ import {
   Stack,
   TextField,
   Typography,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close"; // 閉じるボタン用のアイコン
-import FastfoodIcon from "@mui/icons-material/Fastfood"; //食事アイコン
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { ExpenseCategory, IncomeCategory, Transaction } from "../types";
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close'; // 閉じるボタン用のアイコン
+import FastfoodIcon from '@mui/icons-material/Fastfood'; //食事アイコン
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { ExpenseCategory, IncomeCategory, Transaction } from '../types';
 import {
   AddBusiness,
   AddHome,
@@ -22,10 +22,10 @@ import {
   Savings,
   SportsTennis,
   Work,
-} from "@mui/icons-material";
-import { useEffect, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Schema, transactionScheme } from "../validations/schema";
+} from '@mui/icons-material';
+import { useEffect, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Schema, transactionScheme } from '../validations/schema';
 
 interface TransactionFormProps {
   onCloseForm: () => void;
@@ -34,12 +34,11 @@ interface TransactionFormProps {
   onSaveTransaction: (transaction: Schema) => Promise<void>;
   selectedTransaction: Transaction | null;
   onDeleteTransaction: (transactionId: string) => Promise<void>;
-  setSelectedTransaction: React.Dispatch<
-    React.SetStateAction<Transaction | null>
-  >;
+  setSelectedTransaction: React.Dispatch<React.SetStateAction<Transaction | null>>;
+  onUpdateTransaction: (transaction: Schema, transactionId: string) => Promise<void>;
 }
 
-type IncomeExpense = "income" | "expense";
+type IncomeExpense = 'income' | 'expense';
 
 interface CategoryItem {
   label: IncomeCategory | ExpenseCategory;
@@ -54,21 +53,22 @@ const TransactionForm = ({
   selectedTransaction,
   onDeleteTransaction,
   setSelectedTransaction,
+  onUpdateTransaction,
 }: TransactionFormProps) => {
   const formWidth = 320;
 
   const expenseCategories: CategoryItem[] = [
-    { label: "食費", icon: <FastfoodIcon fontSize="small" /> },
-    { label: "日用品", icon: <Alarm fontSize="small" /> },
-    { label: "交際費", icon: <Diversity3 fontSize="small" /> },
-    { label: "娯楽", icon: <SportsTennis fontSize="small" /> },
-    { label: "固定費", icon: <AddHome fontSize="small" /> },
+    { label: '食費', icon: <FastfoodIcon fontSize="small" /> },
+    { label: '日用品', icon: <Alarm fontSize="small" /> },
+    { label: '交際費', icon: <Diversity3 fontSize="small" /> },
+    { label: '娯楽', icon: <SportsTennis fontSize="small" /> },
+    { label: '固定費', icon: <AddHome fontSize="small" /> },
   ];
 
   const incomeCategories: CategoryItem[] = [
-    { label: "給与", icon: <Work fontSize="small" /> },
-    { label: "副収入", icon: <AddBusiness fontSize="small" /> },
-    { label: "お小遣い", icon: <Savings fontSize="small" /> },
+    { label: '給与', icon: <Work fontSize="small" /> },
+    { label: '副収入', icon: <AddBusiness fontSize="small" /> },
+    { label: 'お小遣い', icon: <Savings fontSize="small" /> },
   ];
 
   const [categories, setCategories] = useState(expenseCategories);
@@ -82,68 +82,94 @@ const TransactionForm = ({
     handleSubmit,
   } = useForm<Schema>({
     defaultValues: {
-      type: "expense",
+      type: 'expense',
       date: currentDay,
       amount: 0,
-      category: "",
-      content: "",
+      category: '',
+      content: '',
     },
     resolver: zodResolver(transactionScheme),
   });
 
   const incomeExpenseToggle = (type: IncomeExpense) => {
-    setValue("type", type);
-    setValue("category", "");
-    type === "income"
-      ? setCategories(incomeCategories)
-      : setCategories(expenseCategories);
+    setValue('type', type);
+    setValue('category', '');
+    console.log(type);
+    // type === 'income' ? setCategories(incomeCategories) : setCategories(expenseCategories);
   };
 
   // 収支タイプを監視
-  const currentType = watch("type");
+  const currentType = watch('type');
 
   useEffect(() => {
-    setValue("date", currentDay);
+    setValue('date', currentDay);
   }, [currentDay]);
 
   // 送信処理
   const onSubmit: SubmitHandler<Schema> = (data) => {
     console.log(data);
-    onSaveTransaction(data);
+    if (selectedTransaction) {
+      onUpdateTransaction(data, selectedTransaction.id)
+        .then(() => {
+          // console.log('更新しました。');
+          setSelectedTransaction(null);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      onSaveTransaction(data)
+        .then(() => {
+          console.log('保存しました。');
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
     reset({
-      type: "expense",
+      type: 'expense',
       date: currentDay,
       amount: 0,
-      category: "",
-      content: "",
+      category: '',
+      content: '',
     });
   };
+
+  useEffect(() => {
+    // 選択肢が更新されたか確認
+    if (selectedTransaction) {
+      const isCategoryExists = categories.some(
+        (category) => category.label === selectedTransaction.category
+      );
+      setValue('category', isCategoryExists ? selectedTransaction.category : '');
+    }
+    console.log(categories);
+  }, [selectedTransaction, categories]);
 
   // フォーム内容更新
   useEffect(() => {
     if (selectedTransaction) {
-      setValue("type", selectedTransaction.type);
-      setValue("date", selectedTransaction.date);
-      setValue("amount", selectedTransaction.amount);
-      setValue("category", selectedTransaction.category);
-      setValue("content", selectedTransaction.content);
+      setValue('type', selectedTransaction.type);
+      setValue('date', selectedTransaction.date);
+      setValue('amount', selectedTransaction.amount);
+      setValue('content', selectedTransaction.content);
     } else {
       reset({
-        type: "expense",
+        type: 'expense',
         date: currentDay,
         amount: 0,
-        category: "",
-        content: "",
+        category: '',
+        content: '',
       });
     }
   }, [selectedTransaction]);
 
   // React推奨のuseEffectの使用方法ではない？ Reactの外側との連携に留めるべき？
-  // useEffect(() => {
-  //   const newCategories = currentType === "income" ? incomeCategories : expenseCategories;
-  //   console.log(newCategories);
-  //   setCategories(newCategories);
-  // }, [currentType])
+  useEffect(() => {
+    const newCategories = currentType === 'income' ? incomeCategories : expenseCategories;
+    console.log(newCategories);
+    setCategories(newCategories);
+  }, [currentType]);
 
   const handleDelete = () => {
     if (selectedTransaction) {
@@ -155,25 +181,25 @@ const TransactionForm = ({
   return (
     <Box
       sx={{
-        position: "fixed",
+        position: 'fixed',
         top: 64,
-        right: isEntryDrawerOpen ? formWidth : "-2%", // フォームの位置を調整
+        right: isEntryDrawerOpen ? formWidth : '-2%', // フォームの位置を調整
         width: formWidth,
-        height: "100%",
-        bgcolor: "background.paper",
+        height: '100%',
+        bgcolor: 'background.paper',
         zIndex: (theme) => theme.zIndex.drawer - 1,
         transition: (theme) =>
-          theme.transitions.create("right", {
+          theme.transitions.create('right', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
           }),
         p: 2, // 内部の余白
-        boxSizing: "border-box", // ボーダーとパディングをwidthに含める
-        boxShadow: "0px 0px 15px -5px #777777",
+        boxSizing: 'border-box', // ボーダーとパディングをwidthに含める
+        boxShadow: '0px 0px 15px -5px #777777',
       }}
     >
       {/* 入力エリアヘッダー */}
-      <Box display={"flex"} justifyContent={"space-between"} mb={2}>
+      <Box display={'flex'} justifyContent={'space-between'} mb={2}>
         <Typography variant="h6">入力</Typography>
         {/* 閉じるボタン */}
         <IconButton
@@ -187,7 +213,7 @@ const TransactionForm = ({
       </Box>
       {/* テスト */}
       {/* フォーム要素 */}
-      <Box component={"form"} onSubmit={handleSubmit(onSubmit)}>
+      <Box component={'form'} onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
           {/* 収支切り替えボタン */}
           <Controller
@@ -196,15 +222,15 @@ const TransactionForm = ({
             render={({ field }) => (
               <ButtonGroup fullWidth>
                 <Button
-                  variant={field.value === "expense" ? "contained" : "outlined"}
+                  variant={field.value === 'expense' ? 'contained' : 'outlined'}
                   color="error"
-                  onClick={() => incomeExpenseToggle("expense")}
+                  onClick={() => incomeExpenseToggle('expense')}
                 >
                   支出
                 </Button>
                 <Button
-                  variant={field.value === "income" ? "contained" : "outlined"}
-                  onClick={() => incomeExpenseToggle("income")}
+                  variant={field.value === 'income' ? 'contained' : 'outlined'}
+                  onClick={() => incomeExpenseToggle('income')}
                 >
                   収入
                 </Button>
@@ -257,7 +283,7 @@ const TransactionForm = ({
             render={({ field }) => (
               <TextField
                 {...field}
-                value={field.value === 0 ? "" : field.value}
+                value={field.value === 0 ? '' : field.value}
                 onChange={(e) => {
                   const newValue = parseInt(e.target.value, 10) || 0;
                   field.onChange(newValue);
@@ -287,18 +313,13 @@ const TransactionForm = ({
           <Button
             type="submit"
             variant="contained"
-            color={currentType === "income" ? "primary" : "error"}
+            color={currentType === 'income' ? 'primary' : 'error'}
             fullWidth
           >
-            保存
+            {selectedTransaction ? '更新' : '保存'}
           </Button>
           {selectedTransaction && (
-            <Button
-              onClick={handleDelete}
-              variant="outlined"
-              color={"secondary"}
-              fullWidth
-            >
+            <Button onClick={handleDelete} variant="outlined" color={'secondary'} fullWidth>
               削除
             </Button>
           )}
