@@ -33,7 +33,7 @@ export default function AppLayout() {
   return (
     <Box
       sx={{
-        display: 'flex',
+        display: { md: 'flex' },
         bgcolor: (theme) => theme.palette.grey[100],
         minHeight: '100vh',
       }}
@@ -58,12 +58,7 @@ export default function AppLayout() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            fontWeight="fontWeightBold"
-          >
+          <Typography variant="h6" noWrap component="div" fontWeight="fontWeightBold">
             React × TypeScript 家計簿
           </Typography>
         </Toolbar>
