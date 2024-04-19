@@ -62,7 +62,7 @@ const CategoryChart = ({ monthlyTransactions }: CategoryChartProps) => {
           onChange={(e) => setSelectedType(e.target.value as TransactionType)}
         >
           <MenuItem value={'income'}>収入</MenuItem>
-          <MenuItem value={'expense'}>支出</MenuItem>
+          <MenuItem value={'expense'}>支出だよ</MenuItem>
         </Select>
       </FormControl>
       <Pie data={data} />
