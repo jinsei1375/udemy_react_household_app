@@ -1,9 +1,9 @@
-import { Grid, Paper } from "@mui/material";
-import MonthSelector from "../components/MonthSelector";
-import CategoryChart from "../components/CategoryChart";
-import TransactionTable from "../components/TransactionTable";
-import BarChart from "../components/BarChart";
-import { Transaction } from "../types";
+import { Grid, Paper } from '@mui/material';
+import MonthSelector from '../components/MonthSelector';
+import CategoryChart from '../components/CategoryChart';
+import TransactionTable from '../components/TransactionTable';
+import BarChart from '../components/BarChart';
+import { Transaction } from '../types';
 
 interface ReportProps {
   currentMonth: Date;
@@ -14,9 +14,9 @@ interface ReportProps {
 
 const Report = ({ currentMonth, setCurrentMonth, monthlyTransactions, isLoading }: ReportProps) => {
   const commonPaperStyle = {
-    height: "400px",
-    display: "flex",
-    flexDirection: "column",
+    height: '400px',
+    display: 'flex',
+    flexDirection: 'column',
     p: 2,
   };
 

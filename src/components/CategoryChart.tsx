@@ -8,12 +8,12 @@ import {
   TextField,
   Typography,
   useTheme,
-} from "@mui/material";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, ChartData } from "chart.js";
-import { useState } from "react";
-import { Pie } from "react-chartjs-2";
-import { ExpenseCategory, IncomeCategory, Transaction, TransactionType } from "../types";
-import { theme } from "../theme/theme";
+} from '@mui/material';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, ChartData } from 'chart.js';
+import { useState } from 'react';
+import { Pie } from 'react-chartjs-2';
+import { ExpenseCategory, IncomeCategory, Transaction, TransactionType } from '../types';
+import { theme } from '../theme/theme';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -24,7 +24,7 @@ interface CategoryChartProps {
 
 const CategoryChart = ({ monthlyTransactions, isLoading }: CategoryChartProps) => {
   const theme = useTheme();
-  const [selecedType, setSelectedType] = useState<TransactionType>("expense");
+  const [selecedType, setSelectedType] = useState<TransactionType>('expense');
 
   const categorySums = monthlyTransactions
     .filter((transaction) => transaction.type === selecedType)
@@ -60,14 +60,14 @@ const CategoryChart = ({ monthlyTransactions, isLoading }: CategoryChartProps) =
   };
 
   const getCategoryColor = (category: IncomeCategory | ExpenseCategory): string => {
-    if (selecedType == "income") {
+    if (selecedType == 'income') {
       return incomeCategoryColor[category as IncomeCategory];
     } else {
       return expenseCategoryColor[category as ExpenseCategory];
     }
   };
 
-  const data: ChartData<"pie"> = {
+  const data: ChartData<'pie'> = {
     labels: categoryLabels,
     datasets: [
       {
@@ -89,11 +89,11 @@ const CategoryChart = ({ monthlyTransactions, isLoading }: CategoryChartProps) =
           label="収支の種類"
           onChange={(e) => setSelectedType(e.target.value as TransactionType)}
         >
-          <MenuItem value={"income"}>収入</MenuItem>
-          <MenuItem value={"expense"}>支出だよ</MenuItem>
+          <MenuItem value={'income'}>収入</MenuItem>
+          <MenuItem value={'expense'}>支出だよ</MenuItem>
         </Select>
       </FormControl>
-      <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         {isLoading ? (
           <CircularProgress />
         ) : monthlyTransactions.length > 0 ? (
