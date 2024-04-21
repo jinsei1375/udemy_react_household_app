@@ -36,7 +36,7 @@ const Report = ({ currentMonth, setCurrentMonth, monthlyTransactions, isLoading 
         </Paper>
       </Grid>
       <Grid item xs={12}>
-        <TransactionTable />
+        <TransactionTable monthlyTransactions={monthlyTransactions} />
       </Grid>
     </Grid>
   );
