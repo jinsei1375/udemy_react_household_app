@@ -57,11 +57,12 @@ function TransactionTableHead(props: TransactionTableHeadProps) {
 
 interface TransactionTableToolbarProps {
   numSelected: number;
+  onDelete: () => void;
 }
 
 // ツールバー
 function TransactionTableToolbar(props: TransactionTableToolbarProps) {
-  const { numSelected } = props;
+  const { numSelected, onDelete } = props;
 
   return (
     <Toolbar
@@ -85,7 +86,7 @@ function TransactionTableToolbar(props: TransactionTableToolbarProps) {
       )}
       {numSelected > 0 && (
         <Tooltip title="Delete">
-          <IconButton>
+          <IconButton onClick={onDelete}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -123,9 +124,13 @@ function FinancialItem({ title, value, color }: FinancialItemProps) {
 
 interface TransactionTableProps {
   monthlyTransactions: Transaction[];
+  onDeleteTransaction: (transactionId: string | readonly string[]) => Promise<void>;
 }
 // テーブル本体;
-export default function TransactionTable({ monthlyTransactions }: TransactionTableProps) {
+export default function TransactionTable({
+  monthlyTransactions,
+  onDeleteTransaction,
+}: TransactionTableProps) {
   const theme = useTheme();
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
@@ -168,6 +173,12 @@ export default function TransactionTable({ monthlyTransactions }: TransactionTab
     setPage(0);
   };
 
+  console.log(selected);
+  const handleDelete = () => {
+    onDeleteTransaction(selected);
+    setSelected([]);
+  };
+
   const isSelected = (id: string) => selected.indexOf(id) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
@@ -194,7 +205,7 @@ export default function TransactionTable({ monthlyTransactions }: TransactionTab
         </Grid>
 
         {/* ツールバー */}
-        <TransactionTableToolbar numSelected={selected.length} />
+        <TransactionTableToolbar numSelected={selected.length} onDelete={handleDelete} />
 
         {/* 取引一覧 */}
         <TableContainer>
