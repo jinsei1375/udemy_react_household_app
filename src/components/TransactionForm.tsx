@@ -27,9 +27,10 @@ import {
   SportsTennis,
   Work,
 } from '@mui/icons-material';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, transactionScheme } from '../validations/schema';
+import { AppContext, useAppContext } from '../context/AppContext';
 
 interface TransactionFormProps {
   onCloseForm: () => void;
@@ -61,6 +62,8 @@ const TransactionForm = ({
 }: TransactionFormProps) => {
   const formWidth = 320;
 
+  const context = useAppContext();
+  console.log(context.transactions);
   const expenseCategories: CategoryItem[] = [
     { label: '食費', icon: <FastfoodIcon fontSize="small" /> },
     { label: '日用品', icon: <Alarm fontSize="small" /> },
@@ -98,7 +101,7 @@ const TransactionForm = ({
   const incomeExpenseToggle = (type: IncomeExpense) => {
     setValue('type', type);
     setValue('category', '');
-    console.log(type);
+    // console.log(type);
     // type === 'income' ? setCategories(incomeCategories) : setCategories(expenseCategories);
   };
 
