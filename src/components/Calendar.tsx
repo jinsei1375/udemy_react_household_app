@@ -1,38 +1,42 @@
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import jaLocale from "@fullcalendar/core/locales/ja";
-import { DatesSetArg, EventContentArg } from "@fullcalendar/core";
-import "../calendar.css";
-import { calculatateDailyBalances } from "../utils/financeCalculataions";
-import { Balance, CalendarContent, Transaction } from "../types";
-import { formatCurrency } from "../utils/formatting";
-import interactionPlugin from "@fullcalendar/interaction";
-import { DateClickArg } from "@fullcalendar/interaction";
-import { useTheme } from "@mui/material";
-import { isSameMonth } from "date-fns";
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import jaLocale from '@fullcalendar/core/locales/ja';
+import { DatesSetArg, EventContentArg } from '@fullcalendar/core';
+import '../calendar.css';
+import { calculatateDailyBalances } from '../utils/financeCalculataions';
+import { Balance, CalendarContent, Transaction } from '../types';
+import { formatCurrency } from '../utils/formatting';
+import interactionPlugin from '@fullcalendar/interaction';
+import { DateClickArg } from '@fullcalendar/interaction';
+import { useTheme } from '@mui/material';
+import { isSameMonth } from 'date-fns';
+import useMonthlyTransactions from '../hooks/useMonthlyTransactions';
+import { useAppContext } from '../context/AppContext';
 
 interface CalendarProps {
-  monthlyTransactions: Transaction[];
-  setCurrentMonth: React.Dispatch<React.SetStateAction<Date>>;
+  // monthlyTransactions: Transaction[];
+  // setCurrentMonth: React.Dispatch<React.SetStateAction<Date>>;
   setCurrentDay: React.Dispatch<React.SetStateAction<string>>;
   currentDay: string;
   today: string;
 }
 
 const Calendar = ({
-  monthlyTransactions,
-  setCurrentMonth,
+  // monthlyTransactions,
+  // setCurrentMonth,
   setCurrentDay,
   currentDay,
   today,
 }: CalendarProps) => {
   const theme = useTheme();
+  const monthlyTransactions = useMonthlyTransactions();
+  const { setCurrentMonth } = useAppContext();
 
   const events = [
-    { title: "Meeting", start: "2024-04-04" },
+    { title: 'Meeting', start: '2024-04-04' },
     {
-      title: "Meeting",
-      start: "2024-04-04",
+      title: 'Meeting',
+      start: '2024-04-04',
       income: 300,
       expense: 400,
       balance: -100,
@@ -41,7 +45,7 @@ const Calendar = ({
 
   const backgroundEvent = {
     start: currentDay,
-    display: "background",
+    display: 'background',
     backgroundColor: theme.palette.incomeColor.light,
   };
 
@@ -63,9 +67,7 @@ const Calendar = ({
   };
 
   // FullCalendar表示のためのイベント生成
-  const createCalendarEvents = (
-    dailyBalances: Record<string, Balance>
-  ): CalendarContent[] => {
+  const createCalendarEvents = (dailyBalances: Record<string, Balance>): CalendarContent[] => {
     return Object.keys(dailyBalances).map((date) => {
       const { income, expense, balance } = dailyBalances[date];
       return {
