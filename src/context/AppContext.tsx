@@ -5,6 +5,7 @@ import { Schema } from '../validations/schema';
 import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { isFireStoreError } from '../utils/errorHandling';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 interface AppContextType {
   transactions: Transaction[];
@@ -13,6 +14,7 @@ interface AppContextType {
   setCurrentMonth: React.Dispatch<React.SetStateAction<Date>>;
   isLoading: Boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  isMobile: Boolean;
   onSaveTransaction: (transaction: Schema) => Promise<void>;
   onDeleteTransaction: (transactionIds: string | readonly string[]) => Promise<void>;
   onUpdateTransaction: (transaction: Schema, transactionId: string) => Promise<void>;
@@ -24,6 +26,10 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isLoading, setIsLoading] = useState(true);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
+  console.log(isMobile);
 
   // 取引を保存する処理
   const onSaveTransaction = async (transaction: Schema) => {
@@ -106,6 +112,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         setCurrentMonth,
         isLoading,
         setIsLoading,
+        isMobile,
         onSaveTransaction,
         onDeleteTransaction,
         onUpdateTransaction,

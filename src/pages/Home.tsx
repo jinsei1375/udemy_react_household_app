@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { Schema } from '../validations/schema';
 import useMonthlyTransactions from '../hooks/useMonthlyTransactions';
+import { DateClickArg } from '@fullcalendar/interaction';
 
 // interface HomeProps {
 //   monthlyTransactions: Transaction[];
@@ -39,6 +40,8 @@ const Home = () =>
       });
     }, [monthlyTransactions, currentDay]);
 
+    const [isMobileDraoerOpen, setIsMobileDraoerOpen] = useState(false);
+
     // フォームの開閉処理
     const handleAddTransactionForm = () => {
       if (selectedTransaction) {
@@ -60,6 +63,15 @@ const Home = () =>
       setSelectedTransaction(transaction);
     };
 
+    const handleDateClick = (dateInfo: DateClickArg) => {
+      setCurrentDay(dateInfo.dateStr);
+      setIsMobileDraoerOpen(true);
+    };
+
+    const handleCloseMobileDrawer = () => {
+      setIsMobileDraoerOpen(false);
+    };
+
     return (
       <Box sx={{ display: 'flex' }}>
         {/* 左側コンテンツ */}
@@ -73,6 +85,7 @@ const Home = () =>
             setCurrentDay={setCurrentDay}
             currentDay={currentDay}
             today={today}
+            onDateClick={handleDateClick}
           />
         </Box>
 
@@ -83,6 +96,8 @@ const Home = () =>
             currentDay={currentDay}
             onHandleAddTransactionForm={handleAddTransactionForm}
             onSelectTransaction={handleSelectTransaction}
+            open={isMobileDraoerOpen}
+            onClose={handleCloseMobileDrawer}
           />
           <TransactionForm
             onCloseForm={onCloseForm}
