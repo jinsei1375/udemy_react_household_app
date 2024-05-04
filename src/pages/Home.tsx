@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import { Schema } from '../validations/schema';
 import useMonthlyTransactions from '../hooks/useMonthlyTransactions';
 import { DateClickArg } from '@fullcalendar/interaction';
+import { useAppContext } from '../context/AppContext';
 
 // interface HomeProps {
 //   monthlyTransactions: Transaction[];
@@ -33,6 +34,9 @@ const Home = () =>
     const [currentDay, setCurrentDay] = useState(today);
     const [isEntryDrawerOpen, setIsEntryDrawerOpen] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const { isMobile } = useAppContext();
 
     const dailyTransactions = useMemo(() => {
       return monthlyTransactions.filter((transaction) => {
@@ -44,23 +48,34 @@ const Home = () =>
 
     // フォームの開閉処理
     const handleAddTransactionForm = () => {
-      if (selectedTransaction) {
-        setSelectedTransaction(null);
+      if (isMobile) {
+        setIsDialogOpen(true);
       } else {
-        setIsEntryDrawerOpen(!isEntryDrawerOpen);
+        if (selectedTransaction) {
+          setSelectedTransaction(null);
+        } else {
+          setIsEntryDrawerOpen(!isEntryDrawerOpen);
+        }
       }
     };
 
     const onCloseForm = () => {
       setSelectedTransaction(null);
-      setIsEntryDrawerOpen(!isEntryDrawerOpen);
+      if (isMobile) {
+        setIsDialogOpen(!isDialogOpen);
+      } else {
+        setIsEntryDrawerOpen(!isEntryDrawerOpen);
+      }
     };
 
     // 取引が選択された時の処理
     const handleSelectTransaction = (transaction: Transaction) => {
-      console.log(transaction);
-      setIsEntryDrawerOpen(true);
       setSelectedTransaction(transaction);
+      if (isMobile) {
+        setIsDialogOpen(true);
+      } else {
+        setIsEntryDrawerOpen(true);
+      }
     };
 
     const handleDateClick = (dateInfo: DateClickArg) => {
@@ -102,6 +117,8 @@ const Home = () =>
           <TransactionForm
             onCloseForm={onCloseForm}
             isEntryDrawerOpen={isEntryDrawerOpen}
+            isDialogOpen={isDialogOpen}
+            setIsDialogOpen={setIsDialogOpen}
             currentDay={currentDay}
             // onSaveTransaction={onSaveTransaction}
             selectedTransaction={selectedTransaction}
